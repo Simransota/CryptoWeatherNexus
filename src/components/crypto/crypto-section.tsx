@@ -6,6 +6,9 @@ import { CryptoCard } from "./crypto-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Star } from "lucide-react"
 
 // Define the CryptoData type to match what CryptoCard expects
 interface CryptoData {
@@ -55,34 +58,43 @@ export function CryptoSection() {
     )
   }
 
+  const favoriteCryptos = data.filter((crypto: CryptoData) => favorites.includes(crypto.id))
+  const nonFavoriteCryptos = data.filter((crypto: CryptoData) => !favorites.includes(crypto.id))
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Cryptocurrency</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-6">
           {favorites.length > 0 && (
-            <div className="mb-4">
-              <h3 className="text-sm font-medium mb-2">Favorites</h3>
+            <div>
+              <h3 className="text-sm font-medium mb-3 flex items-center gap-2 text-yellow-500">
+                <Star className="h-4 w-4" fill="currentColor" />
+                Favorites List
+              </h3>
               <div className="space-y-3">
-                {data
-                  .filter((crypto: CryptoData) => favorites.includes(crypto.id))
-                  .map((crypto: CryptoData) => (
-                    <Link href={`/crypto/${crypto.id}`} key={crypto.id}>
-                      <CryptoCard crypto={crypto} isFavorite={true} />
-                    </Link>
-                  ))}
+                {favoriteCryptos.map((crypto: CryptoData) => (
+                  <Link href={`/crypto/${crypto.id}`} key={crypto.id}>
+                    <CryptoCard crypto={crypto} isFavorite={true} />
+                  </Link>
+                ))}
               </div>
             </div>
           )}
 
-          <div className="space-y-3">
-            {data.map((crypto: CryptoData) => (
-              <Link href={`/crypto/${crypto.id}`} key={crypto.id}>
-                <CryptoCard crypto={crypto} isFavorite={favorites.includes(crypto.id)} />
-              </Link>
-            ))}
+          <div>
+            <h3 className="text-sm font-medium mb-3 flex items-center gap-2 text-muted-foreground">
+              All Cryptocurrencies
+            </h3>
+            <div className="space-y-3">
+              {nonFavoriteCryptos.map((crypto: CryptoData) => (
+                <Link href={`/crypto/${crypto.id}`} key={crypto.id}>
+                  <CryptoCard crypto={crypto} isFavorite={false} />
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </CardContent>

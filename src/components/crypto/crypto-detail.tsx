@@ -180,78 +180,103 @@ export function CryptoDetail({ cryptoId }: CryptoDetailProps) {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Price Area Chart */}
-                <div className="h-[300px]">
-                  <CardTitle className="text-sm mb-4">Price Trend</CardTitle>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={chartData}
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <defs>
-                        <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="date" />
-                      <YAxis 
-                        domain={['auto', 'auto']}
-                        tickFormatter={(value) => `$${value.toLocaleString()}`}
-                      />
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                      <Tooltip 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Price']}
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))',
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: '0.5rem'
-                        }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="price" 
-                        stroke="hsl(var(--primary))" 
-                        fillOpacity={1} 
-                        fill="url(#colorPrice)" 
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+              {/* Price Area Chart */}
+              <div className="h-[300px]">
+                <CardTitle className="text-sm mb-4">Price Trend</CardTitle>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.2} />
+                      </linearGradient>
+                    </defs>
 
-                {/* Daily Change Bar Chart */}
-                <div className="h-[300px]">
-                  <CardTitle className="text-sm mb-4">Daily Price Change (%)</CardTitle>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData.slice(1)} // Skip first day as it has no change
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <XAxis dataKey="date" />
-                      <YAxis 
-                        tickFormatter={(value) => `${value.toFixed(1)}%`}
-                      />
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                      <Tooltip 
-                        formatter={(value: number) => [`${value.toFixed(2)}%`, 'Change']}
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))',
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: '0.5rem'
-                        }}
-                      />
-                      <Bar dataKey="change">
-                        {chartData.slice(1).map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={entry.change >= 0 ? 'hsl(var(--green))' : 'hsl(var(--red))'} 
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                    <XAxis
+                      dataKey="date"
+                      stroke="gray"
+                      tick={{ fill: "gray" }}
+                    />
+                    <YAxis
+                      stroke="gray"
+                      tick={{ fill: "gray" }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} stroke="gray" />
+
+                    <Tooltip
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Price']}
+                      contentStyle={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        borderColor: 'gray',
+                        borderRadius: '0.5rem',
+                        color: 'white'
+                      }}
+                      labelStyle={{ color: 'white' }}
+                    />
+
+                    <Area
+                      type="monotone"
+                      dataKey="price"
+                      stroke="#10b981"
+                      fillOpacity={1}
+                      fill="url(#colorPrice)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
+
+              {/* Daily Change Bar Chart */}
+              <div className="h-[300px]">
+                <CardTitle className="text-sm mb-4">Daily Price Change (%)</CardTitle>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData.slice(1)} // Skip first day as it has no change
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    {/* Axis Styling */}
+                    <XAxis
+                      dataKey="date"
+                      stroke="gray"
+                      tick={{ fill: "gray" }}
+                    />
+                    <YAxis
+                      tickFormatter={(value) => `${value.toFixed(1)}%`}
+                      stroke="gray"
+                      tick={{ fill: "gray" }}
+                    />
+
+                    {/* Grid Lines */}
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} stroke="gray" />
+
+                    {/* Tooltip Styling */}
+                    <Tooltip
+                      formatter={(value: number) => [`${value.toFixed(2)}%`, 'Change']}
+                      contentStyle={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        borderColor: 'gray',
+                        borderRadius: '0.5rem',
+                        color: 'white',
+                      }}
+                      labelStyle={{ color: 'white' }}
+                    />
+
+                    {/* Bar Colors */}
+                    <Bar dataKey="change">
+                      {chartData.slice(1).map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.change >= 0 ? '#10b981' : '#ef4444'}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
             )}
           </CardContent>
         </Card>

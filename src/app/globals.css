@@ -9,8 +9,12 @@
 
 @layer base {
   :root {
+    --green: 120, 80%, 45%; /* Adjust as needed */
+    --card: 240, 10%, 20%; /* Card background color */
+    --foreground: 0, 0%, 100%; /* Text color */
+    --red: 0, 100%, 60%; /* Red color for negative values */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+   
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
