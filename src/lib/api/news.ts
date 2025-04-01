@@ -26,11 +26,7 @@ interface NewsApiResponse {
   // Cache storage
   let cachedNews: NewsItem[] | null = null;
   let lastFetchTime: number | null = null;
-  const CACHE_DURATION = 10 * 60 * 1000; // Cache for 10 minutes
-  
-  // Track API usage
-  let creditsUsed = 0;
-  const MAX_CREDITS = 200;
+  const CACHE_DURATION = 5 * 60 * 1000; // Cache for 5 minutes
   
   // Helper function to delay execution
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -43,17 +39,10 @@ interface NewsApiResponse {
   export async function fetchCryptoNews(retries = 3): Promise<NewsItem[]> {
     const now = Date.now();
   
-    // Serve cached data if still fresh
+    // Serve cached data if it's still fresh
     if (cachedNews && lastFetchTime && now - lastFetchTime < CACHE_DURATION) {
       console.log("Serving cached news data...");
       return cachedNews;
-    }
-  
-    // Prevent API calls if credits are exhausted
-    if (creditsUsed >= MAX_CREDITS) {
-      console.warn("API credits exhausted. Returning cached data...");
-      if (cachedNews) return cachedNews;
-      throw new Error("API credits exhausted. Try again later.");
     }
   
     try {
@@ -68,7 +57,7 @@ interface NewsApiResponse {
   
       console.log("Fetching fresh crypto news...");
       const response = await fetch(
-        `https://newsdata.io/api/1/news?apikey=${API_KEY}&q=cryptocurrency&language=en&size=20`, // Fetch 20 articles per request
+        `https://newsdata.io/api/1/news?apikey=${API_KEY}&q=cryptocurrency&language=en&size=10`, // Fetch more news in one call
         { 
           signal: controller.signal,
           cache: 'no-cache',
@@ -86,6 +75,7 @@ interface NewsApiResponse {
         const errorMessage = `Failed to fetch news data: ${response.status} ${response.statusText}`;
   
         if (response.status === 429 && retries > 0) {
+          // Respect exponential backoff strategy
           const backoffDelay = Math.pow(2, 3 - retries) * 1000;
           console.log(`Rate limit hit. Retrying in ${backoffDelay / 1000} seconds...`);
           await delay(backoffDelay);
@@ -101,10 +91,7 @@ interface NewsApiResponse {
         throw new Error("Invalid news data format received");
       }
   
-      // Track API credits used (Assuming 1 request = 1 credit)
-      creditsUsed++;
-  
-      // Transform API response
+      // Transform API response to match our format
       cachedNews = data.results.map((item: NewsApiItem) => ({
         id: item.article_id,
         title: item.title,
