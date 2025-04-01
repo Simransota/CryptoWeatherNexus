@@ -1,5 +1,5 @@
 "use client"
-
+import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { ArrowLeft, ExternalLink } from 'lucide-react'
@@ -28,8 +28,10 @@ type PriceHistoryItem = {
   price: number
 }
 
-export default function CryptoDetailPage({ params }: { params: { id: string } }) {
-  const cryptoId = params.id
+export default function CryptoDetailPage() {
+    const params = useParams()
+    const cryptoId = params.id as string
+ 
   const cryptoData = useSelector((state: RootState) => state.crypto.data.find((item: { id: string }) => item.id === cryptoId))
 
   const [history, setHistory] = useState<PriceHistoryItem[]>([])
