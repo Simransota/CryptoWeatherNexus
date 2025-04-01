@@ -13,9 +13,12 @@ export function NewsCard({ news }: NewsCardProps) {
     year: "numeric",
   })
 
+  // Ensure URL has proper protocol
+  const formattedUrl = news.url.startsWith('http') ? news.url : `https://${news.url}`
+
   return (
     <a
-      href={news.url}
+      href={formattedUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="group block p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all duration-200 cursor-pointer"
