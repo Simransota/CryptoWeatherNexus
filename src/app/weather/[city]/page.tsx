@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { useSelector } from "react-redux"
 import { ArrowLeft } from "lucide-react"
 import type { RootState } from "@/redux/store"
@@ -17,8 +17,9 @@ type WeatherHistoryItem = {
   conditions: string
 }
 
-export default function CityWeatherPage({ params }: { params: { city: string } }) {
-  const city = decodeURIComponent(params.city)
+export default function CityWeatherPage({ params }: { params: Promise<{ city: string }> }) {
+  const resolvedParams = use(params)
+  const city = decodeURIComponent(resolvedParams.city)
   const weatherData = useSelector((state: RootState) => state.weather.data.find((item: { city: string }) => item.city === city))
 
   const [history, setHistory] = useState<WeatherHistoryItem[]>([])
