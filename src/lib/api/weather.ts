@@ -41,23 +41,50 @@ export async function fetchCityWeatherHistory(city: string) {
   }
 
   try {
+    // First, get the coordinates for the city
+    const geocodeResponse = await fetch(
+      `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${WEATHER_API_KEY}`
+    );
+
+    if (!geocodeResponse.ok) {
+      throw new Error(`Failed to fetch coordinates for ${city}`);
+    }
+
+    const geocodeData = await geocodeResponse.json();
+    if (!geocodeData.length) {
+      throw new Error(`City ${city} not found`);
+    }
+
+    const { lat, lon } = geocodeData[0];
+
+    // Then fetch the 5-day forecast
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=0&lon=0&dt=${Math.floor(
-        Date.now() / 1000
-      )}&units=metric&appid=${WEATHER_API_KEY}`
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${WEATHER_API_KEY}`
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch weather history for ${city}`);
+      throw new Error(`Failed to fetch weather forecast for ${city}`);
     }
 
     const data = await response.json();
-    return data.hourly.map((entry: { dt: number; temp: any; humidity: any; weather: { main: any; }[]; }) => ({
-      date: new Date(entry.dt * 1000).toISOString().split("T")[0],
-      temperature: entry.temp,
-      humidity: entry.humidity,
-      conditions: entry.weather[0].main,
-    }));
+    
+    // Group forecasts by day and get the first forecast of each day
+    const dailyForecasts = data.list.reduce((acc: any[], forecast: any) => {
+      const date = new Date(forecast.dt * 1000).toISOString().split('T')[0];
+      
+      // Only add the first forecast of each day
+      if (!acc.find(item => item.date === date)) {
+        acc.push({
+          date,
+          temperature: forecast.main.temp,
+          humidity: forecast.main.humidity,
+          conditions: forecast.weather[0].main,
+        });
+      }
+      return acc;
+    }, []);
+
+    return dailyForecasts;
   } catch (error) {
     console.error(`Error fetching weather history for ${city}:`, error);
     throw error;
