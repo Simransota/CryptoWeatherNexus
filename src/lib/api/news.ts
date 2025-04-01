@@ -5,11 +5,21 @@ export async function fetchCryptoNews() {
       
       // Create an AbortController for timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
       const response = await fetch(
         `https://newsdata.io/api/1/news?apikey=${API_KEY}&q=cryptocurrency&language=en&size=5`,
-        { signal: controller.signal }
+        { 
+          signal: controller.signal,
+          // Add cache control to prevent stale data
+          cache: 'no-cache',
+          // Add headers to indicate we want fresh data
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        }
       );
   
       clearTimeout(timeoutId);
@@ -46,7 +56,7 @@ export async function fetchCryptoNews() {
       // Handle specific error cases
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          throw new Error("Request timed out. Please try again.");
+          throw new Error("Request is taking too long. Please check your connection and try again.");
         }
       }
       
