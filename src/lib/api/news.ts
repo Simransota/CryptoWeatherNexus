@@ -10,14 +10,22 @@ export async function fetchCryptoNews() {
   
       const data = await response.json()
   
-      return data.results.map((item: any) => ({
-        id: item.article_id,
-        title: item.title,
-        description: item.description,
-        url: item.link,
-        source: item.source_id,
-        publishedAt: item.pubDate,
-      }))
+      return data.results.map((item: any) => {
+        // Sanitize URL
+        let url = item.link
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = `https://${url}`
+        }
+        
+        return {
+          id: item.article_id,
+          title: item.title,
+          description: item.description,
+          url: url,
+          source: item.source_id,
+          publishedAt: item.pubDate,
+        }
+      })
     } catch (error) {
       console.error("Error fetching news data:", error)
   
@@ -28,7 +36,7 @@ export async function fetchCryptoNews() {
           title: "Bitcoin Surges Past $65,000 as Institutional Adoption Grows",
           description:
             "Bitcoin has reached new heights as major financial institutions continue to invest in the cryptocurrency.",
-          url: "#",
+          url: "https://example.com",
           source: "CryptoNews",
           publishedAt: new Date().toISOString(),
         },
