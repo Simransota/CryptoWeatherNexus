@@ -23,10 +23,24 @@ const initialState: WeatherState = {
   favorites: [],
 }
 
-export const fetchWeatherData = createAsyncThunk("weather/fetchWeatherData", async () => {
-  const cities = ["New York", "London", "Tokyo"]
-  return await fetchWeatherForCities(cities)
+export const fetchWeatherData = createAsyncThunk("weather/fetchWeatherData", async (_, { rejectWithValue }) => {
+  try {
+    const cities = ["New York", "London", "Tokyo"]
+    const weatherData = await fetchWeatherForCities(cities)
+
+    // Remove null values from failed requests
+    const validWeatherData = weatherData.filter((data): data is WeatherData => data !== null)
+
+    if (validWeatherData.length === 0) {
+      return rejectWithValue("No weather data available. Please check API configuration.")
+    }
+
+    return validWeatherData
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Unknown error")
+  }
 })
+
 
 const weatherSlice = createSlice({
   name: "weather",
@@ -53,11 +67,10 @@ const weatherSlice = createSlice({
       })
       .addCase(fetchWeatherData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || "Failed to fetch weather data"
+        state.error = action.payload as string || "Failed to fetch weather data"
       })
   },
 })
 
 export const { toggleFavoriteCity } = weatherSlice.actions
 export default weatherSlice.reducer
-

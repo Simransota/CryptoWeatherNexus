@@ -1,4 +1,4 @@
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const WEATHER_API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
 export async function fetchWeatherForCities(cities: any[]) {
   if (!WEATHER_API_KEY) {
